@@ -21,7 +21,7 @@ public class UserGit {
     private List<Contributors> contributors;
 
     public UserGit(){
-        this.sent = "S";
+        this.sent = "N";
     }
 
 }

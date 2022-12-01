@@ -1,10 +1,6 @@
 package com.desafioswap.webhook.service;
 
-import com.desafioswap.webhook.domain.entity.Contributors;
-import com.desafioswap.webhook.domain.entity.Label;
-import com.desafioswap.webhook.domain.entity.UserGit;
-import com.desafioswap.webhook.domain.entity.Issue;
-import com.desafioswap.webhook.domain.dto.UserFilterDTO;
+import com.desafioswap.webhook.domain.entity.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,53 +29,67 @@ public class GitHubService implements Git {
     }
 
     @Override
-    public UserGit doUserDetails(UserFilterDTO dto) throws JsonProcessingException {
+    public List<UserGit> doUserDetails(List<Task> tasks) throws JsonProcessingException {
 
-        String newURL = BASE_URL + dto.getUserName() + "/" + dto.getRepositoryName();
+        return tasks.stream().map(task -> {
 
-        UserGit userGit = new UserGit();
-        userGit.setUser(dto.getUserName());
-        userGit.setRepository(dto.getRepositoryName());
+            String newURL = BASE_URL + task.getUserName() + "/" + task.getRepositoryName();
 
-        userGit.setIssue(doListIssues(newURL + "/issues"));
-        //gitDTO.setContributors(doListContributors(newURL + "/collaborators"));
+            UserGit userGit = new UserGit();
+            userGit.setUser(task.getUserName());
+            userGit.setRepository(task.getRepositoryName());
+            userGit.setIssue(doListIssues(newURL + "/issues"));
+            //gitDTO.setContributors(doListContributors(newURL + "/collaborators"));
+            return userGit;
 
-        return userGit;
+        }).collect(Collectors.toList());
 
     }
 
     @Override
-    public List<Issue> doListIssues(String url) throws JsonProcessingException {
-        System.out.println(url);
+    public List<Issue> doListIssues(String url) {
 
-        JsonNode jsonNode = objectMapper.readTree(simpleRequest.doRequestURL(url));
+        try {
 
-        return StreamSupport.stream(jsonNode.spliterator(), false)
-                .map((i)-> {
-                    System.out.println(i);
-                    Issue issue = new Issue();
-                    issue.setAuthor(i.get("user").get("login").asText());
-                    issue.setTitle(i.get("title").asText());
-                    //issue.setLabels(doListLabels());
-                    return issue;
-                })
-                .collect(Collectors.toList());
+            JsonNode jsonNode = objectMapper.readTree(simpleRequest.doRequestGet(url));
+
+            return StreamSupport.stream(jsonNode.spliterator(), false)
+                    .map(i -> {
+
+                        Issue issue = new Issue();
+                        issue.setAuthor(i.get("user").get("login").asText());
+                        issue.setTitle(i.get("title").asText());
+                        issue.setLabels(doListLabels(i.get("labels")));
+                        return issue;
+
+                    })
+                    .collect(Collectors.toList());
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     @Override
     public List<Contributors> doListContributors(String url) throws JsonProcessingException {
 
-        JsonNode jsonNode = objectMapper.readTree(simpleRequest.doRequestURL(url));
+        JsonNode jsonNode = objectMapper.readTree(simpleRequest.doRequestGet(url));
         return new ArrayList<>();
 
     }
 
     @Override
-    public List<Label> doListLabels(JsonNode json){
+    public List<Label> doListLabels(JsonNode json) {
+        return StreamSupport.stream(json.spliterator(), false)
+                .map(l -> {
 
-        // json.get.stream().forEach((a)-> System.out.println(a)).collect(Collectors.toList());
-        List<Label> labelDtos = new ArrayList<>();
-        return labelDtos;
+                    Label label = new Label();
+                    label.setName(l.get("name").asText());
+                    return label;
+
+                })
+                .collect(Collectors.toList());
 
     }
 }
