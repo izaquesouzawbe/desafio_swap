@@ -1,13 +1,12 @@
-package com.desafioswap.webhook.domain.GitHub;
+package com.desafioswap.webhook.domain.dto;
 
 import lombok.Data;
-
 import java.util.List;
 
 @Data
-public class IssueDto {
+public class IssueDTO {
 
     private String title;
     private String author;
-    private List<LabelDto> labels;
+    private List<LabelDTO> labels;
 }

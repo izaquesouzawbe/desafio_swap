@@ -1,28 +1,26 @@
 package com.desafioswap.webhook.controller;
 
-import com.desafioswap.webhook.domain.GitHub.UserGitDTO;
-import com.desafioswap.webhook.domain.UserDTO;
-import com.desafioswap.webhook.service.GitHubService;
+import com.desafioswap.webhook.domain.entity.UserGit;
+import com.desafioswap.webhook.service.UserGitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
 
+
     @Autowired
-    GitHubService gitHubService;
+    UserGitService userGitService;
 
     @GetMapping
-    public ResponseEntity findAllIssue(@RequestBody UserDTO dto) throws URISyntaxException, IOException, InterruptedException {
-        UserGitDTO gitDTO = gitHubService.doUser(dto);
-        return ResponseEntity.ok().body(gitDTO);
+    public ResponseEntity findAll() {
+        List<UserGit> userGits = userGitService.findAll();
+        return ResponseEntity.ok().body(userGits);
     }
 }
