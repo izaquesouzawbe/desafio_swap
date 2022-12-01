@@ -11,20 +11,27 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class GitHubService {
+public class GitHubService implements Git {
 
     @Autowired
-    SimpleRequest simpleRequest;
+    SimpleRequestFacade simpleRequest;
 
-    private String BASE_URL = "https://api.github.com/";
+    private String BASE_URL = "https://api.github.com/repos/";
+    private String ClientId = "6c5043be7862b7bffd13";
+    private String Token = "eb16102efc551e8a4582ceddb2821dcaae925881";
+    private String Code = "041c1d11cce301e32ede";
+    private final ObjectMapper objectMapper;
 
-    public UserGitDTO doUser(UserDTO dto) throws URISyntaxException, IOException, InterruptedException {
+    public GitHubService(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
+    @Override
+    public UserGitDTO doUserDetails(UserDTO dto) throws JsonProcessingException {
 
         String newURL = BASE_URL + dto.getUserName() + "/" + dto.getRepositoryName();
 
@@ -32,22 +39,15 @@ public class GitHubService {
         gitDTO.setUser(dto.getUserName());
         gitDTO.setRepository(dto.getRepositoryName());
         gitDTO.setIssueDtos(doListIssues(newURL + "/issues"));
-        //gitDTO.setContributorsDtos(doListContributors(newURL + "/collaborators"));
+        gitDTO.setContributorsDtos(doListContributors(newURL + "/collaborators"));
 
         return gitDTO;
 
     }
 
-    private JsonNode toStringInJson(String value) throws JsonProcessingException {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readTree(value);
-
-    }
-
-    private List<IssueDto> doListIssues(String url) throws IOException, URISyntaxException, InterruptedException {
-
-        JsonNode jsonNode = toStringInJson(simpleRequest.doResponseURL(url));
+    @Override
+    public List<IssueDto> doListIssues(String url) throws JsonProcessingException {
+        JsonNode jsonNode = objectMapper.readTree(simpleRequest.doResponseURL(url));
 
         IssueDto issueDto = new IssueDto();
         issueDto.setAuthor(jsonNode.at("user").asText("login"));
@@ -55,22 +55,22 @@ public class GitHubService {
         issueDto.setLabels(doListLabels(jsonNode.at("labels")));
 
         return new ArrayList<>();
-
     }
 
-    private List<ContributorsDto> doListContributors(String url) throws IOException, URISyntaxException, InterruptedException {
+    @Override
+    public List<ContributorsDto> doListContributors(String url) throws JsonProcessingException {
 
-        JsonNode jsonNode = toStringInJson(simpleRequest.doResponseURL(url));
+        JsonNode jsonNode = objectMapper.readTree(simpleRequest.doResponseURL(url));
         return new ArrayList<>();
+
     }
 
-    private List<LabelDto> doListLabels(JsonNode json){
+    @Override
+    public List<LabelDto> doListLabels(JsonNode json){
 
-       // json.get.stream().forEach((a)-> System.out.println(a)).collect(Collectors.toList());
+        // json.get.stream().forEach((a)-> System.out.println(a)).collect(Collectors.toList());
         List<LabelDto> labelDtos = new ArrayList<>();
         return labelDtos;
 
     }
-
-
 }
