@@ -30,7 +30,23 @@ public class SimpleRequestFacade {
 
     }
 
-    public String doRequestGetWithAuth(){
+    public String doRequestGetWithAuth(String url, String auth){
+
+        try {
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(url))
+                    .headers("Content-Type", "application/json")
+                    .headers("Authorization", "Bearer "+auth)
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            return response.body();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
 
         return "";
 

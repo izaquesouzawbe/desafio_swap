@@ -18,29 +18,36 @@ public class GitHubService implements Git {
     @Autowired
     SimpleRequestFacade simpleRequest;
 
-    private String BASE_URL = "https://api.github.com/repos/";
-    private String ClientId = "6c5043be7862b7bffd13";
-    private String Token = "eb16102efc551e8a4582ceddb2821dcaae925881";
-    private String Code = "041c1d11cce301e32ede";
+    @Autowired
+    ConfigurationService configurationService;
     private final ObjectMapper objectMapper;
+    private Configuration configuration;
+
 
     public GitHubService(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public List<UserGit> doUserDetails(List<Task> tasks) throws JsonProcessingException {
+    public void doConfiguration() {
+        this.configuration = configurationService.findById(1L);
+    }
+
+    @Override
+    public List<UserGit> doUserDetails(List<Task> tasks) {
+
+        doConfiguration();
 
         return tasks.stream().map(task -> {
 
-            String newURL = BASE_URL + task.getUserName() + "/" + task.getRepositoryName();
+            String newURL = configuration.getUrlGitHub() + task.getUserName() + "/" + task.getRepositoryName();
 
             UserGit userGit = new UserGit();
             userGit.setUserName(task.getUserName());
             userGit.setRepository(task.getRepositoryName());
 
             userGit.setIssue(doListIssues(newURL + "/issues"));
-            //gitDTO.setContributors(doListContributors(newURL + "/collaborators"));
+            userGit.setContributors(doListContributors(newURL + "/contributors"));
             return userGit;
 
         }).collect(Collectors.toList());
@@ -52,7 +59,7 @@ public class GitHubService implements Git {
 
         try {
 
-            JsonNode jsonNode = objectMapper.readTree(simpleRequest.doRequestGet(url));
+            JsonNode jsonNode = objectMapper.readTree(simpleRequest.doRequestGetWithAuth(url, configuration.getAuth()));
 
             return StreamSupport.stream(jsonNode.spliterator(), false)
                     .map(i -> {
@@ -69,13 +76,28 @@ public class GitHubService implements Git {
             e.printStackTrace();
         }
 
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
-    public List<Contributors> doListContributors(String url) throws JsonProcessingException {
+    public List<Contributors> doListContributors(String url) {
 
-        JsonNode jsonNode = objectMapper.readTree(simpleRequest.doRequestGet(url));
+        try {
+            JsonNode jsonNode = objectMapper.readTree(simpleRequest.doRequestGetWithAuth(url, configuration.getAuth()));
+            return StreamSupport.stream(jsonNode.spliterator(), false)
+                    .map(c -> {
+
+                        Contributors contributors = new Contributors();
+                        contributors.setUserName(c.get("login").asText());
+                        contributors.setQtdCommits(c.get("contributions").asLong());
+                        return contributors;
+
+                    })
+                    .collect(Collectors.toList());
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
         return new ArrayList<>();
 
     }

@@ -13,7 +13,7 @@ public class UserGit {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String userName;
-    private String sent;
+    private Boolean sent = false;
     private String repository;
     @OneToMany(cascade=CascadeType.PERSIST)
     @JoinColumn(name="issue_id")
@@ -21,9 +21,5 @@ public class UserGit {
     @OneToMany(cascade=CascadeType.PERSIST)
     @JoinColumn(name="contributors_id")
     private List<Contributors> contributors;
-
-    public UserGit(){
-        this.sent = "N";
-    }
 
 }

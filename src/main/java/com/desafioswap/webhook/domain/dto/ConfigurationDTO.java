@@ -1,4 +1,4 @@
-package com.desafioswap.webhook.domain.entity;
+package com.desafioswap.webhook.domain.dto;
 
 import lombok.Data;
 
@@ -7,13 +7,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-@Entity
 @Data
-public class Configuration {
+public class ConfigurationDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
     private String auth;
     private String urlGitHub;
     private String urlWebhook;
