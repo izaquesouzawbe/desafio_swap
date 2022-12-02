@@ -43,6 +43,7 @@ public class SendWebhookJob implements ScheduledJob {
 
     @Override
     @Scheduled(fixedRate = 20000)
+    //@Scheduled(cron = "* * * 2 * *")
     public void execute() {
 
         Optional<Configuration> configuration = configurationService.findConfiguration();

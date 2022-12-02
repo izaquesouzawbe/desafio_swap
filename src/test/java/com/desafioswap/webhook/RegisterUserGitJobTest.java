@@ -8,15 +8,17 @@ import com.desafioswap.webhook.scheduled.RegisterUserGitJob;
 import com.desafioswap.webhook.service.ConfigurationService;
 import com.desafioswap.webhook.service.GitHubService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@SpringBootTest
+@ExtendWith(SpringExtension.class)
 public class RegisterUserGitJobTest {
 
     @Mock

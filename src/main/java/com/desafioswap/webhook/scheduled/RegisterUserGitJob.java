@@ -34,6 +34,7 @@ public class RegisterUserGitJob implements ScheduledJob {
 
     @Override
     @Scheduled(fixedRate = 5000)
+    //@Scheduled(cron = "* * * 1 * *")
     public void execute() {
 
         Optional<Configuration> configuration = configurationService.findConfiguration();
