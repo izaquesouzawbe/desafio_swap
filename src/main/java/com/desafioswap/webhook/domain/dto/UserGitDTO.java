@@ -8,7 +8,6 @@ import java.util.List;
 public class UserGitDTO {
 
     private String userName;
-    private String sent;
     private String repository;
     private List<IssueDTO> issue;
     private List<ContributorsDTO> contributors;
