@@ -36,8 +36,9 @@ public class GitHubService implements Git {
             String newURL = BASE_URL + task.getUserName() + "/" + task.getRepositoryName();
 
             UserGit userGit = new UserGit();
-            userGit.setUser(task.getUserName());
+            userGit.setUserName(task.getUserName());
             userGit.setRepository(task.getRepositoryName());
+
             userGit.setIssue(doListIssues(newURL + "/issues"));
             //gitDTO.setContributors(doListContributors(newURL + "/collaborators"));
             return userGit;

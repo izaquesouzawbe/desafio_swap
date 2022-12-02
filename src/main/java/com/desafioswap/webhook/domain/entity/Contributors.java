@@ -1,11 +1,10 @@
 package com.desafioswap.webhook.domain.entity;
 
 import lombok.Data;
+import org.apache.catalina.User;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Data
@@ -15,7 +14,7 @@ public class Contributors {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
-    private String user;
+    private String userName;
     private Long qtdCommits;
 
 }

@@ -1,15 +1,13 @@
 package com.desafioswap.webhook.domain.dto;
 
-import com.desafioswap.webhook.domain.entity.Contributors;
-import com.desafioswap.webhook.domain.entity.Issue;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class UserDTO {
+public class UserGitDTO {
 
-    private String user;
+    private String userName;
     private String sent;
     private String repository;
     private List<IssueDTO> issue;

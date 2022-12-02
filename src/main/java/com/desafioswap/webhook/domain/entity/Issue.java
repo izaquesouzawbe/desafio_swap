@@ -16,4 +16,6 @@ public class Issue {
     private String author;
     @OneToMany(cascade=CascadeType.PERSIST)
     private List<Label> labels;
+    @ManyToOne
+    private UserGit userGit;
 }

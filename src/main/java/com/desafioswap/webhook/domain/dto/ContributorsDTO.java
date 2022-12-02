@@ -11,7 +11,7 @@ import javax.persistence.Id;
 public class ContributorsDTO {
 
     private String name;
-    private String user;
+    private String userName;
     private Long qtdCommits;
 
 }
