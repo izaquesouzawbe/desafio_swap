@@ -1,5 +1,7 @@
 package com.desafioswap.webhook.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
@@ -9,6 +11,8 @@ import java.net.http.HttpResponse;
 
 @Component
 public class SimpleRequestFacade {
+
+    Logger logger = LoggerFactory.getLogger(SimpleRequestFacade.class);
 
     public String doRequestGet(String url) {
 
@@ -23,7 +27,7 @@ public class SimpleRequestFacade {
 
             return response.body();
         } catch (Exception e){
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
 
         return "";
@@ -45,7 +49,7 @@ public class SimpleRequestFacade {
 
             return response.body();
         } catch (Exception e){
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
 
         return "";
@@ -66,7 +70,7 @@ public class SimpleRequestFacade {
 
             return response.body();
         } catch (Exception e){
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
 
         return "";

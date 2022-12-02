@@ -4,16 +4,21 @@ import com.desafioswap.webhook.domain.entity.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
 public class GitHubService implements Git {
+
+    Logger logger = LoggerFactory.getLogger(GitHubService.class);
 
     @Autowired
     SimpleRequestFacade simpleRequest;
@@ -21,33 +26,31 @@ public class GitHubService implements Git {
     @Autowired
     ConfigurationService configurationService;
     private final ObjectMapper objectMapper;
-    private Configuration configuration;
-
 
     public GitHubService(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public void doConfiguration() {
-        this.configuration = configurationService.findById(1L);
-    }
-
-    @Override
     public List<UserGit> doUserDetails(List<Task> tasks) {
 
-        doConfiguration();
+        Optional<Configuration> configuration = configurationService.findConfiguration();
+
+        if(configuration.isEmpty()){
+            logger.warn("Não existe configuração cadastrada.");
+            return new ArrayList<>();
+        };
 
         return tasks.stream().map(task -> {
 
-            String newURL = configuration.getUrlGitHub() + task.getUserName() + "/" + task.getRepositoryName();
+            String newURL = configuration.get().getUrlGitHub() + task.getUserName() + "/" + task.getRepositoryName();
 
             UserGit userGit = new UserGit();
             userGit.setUserName(task.getUserName());
             userGit.setRepository(task.getRepositoryName());
 
-            userGit.setIssue(doListIssues(newURL + "/issues"));
-            userGit.setContributors(doListContributors(newURL + "/contributors"));
+            userGit.setIssue(doListIssues(newURL + "/issues", configuration.get()));
+            userGit.setContributors(doListContributors(newURL + "/contributors", configuration.get()));
             return userGit;
 
         }).collect(Collectors.toList());
@@ -55,10 +58,9 @@ public class GitHubService implements Git {
     }
 
     @Override
-    public List<Issue> doListIssues(String url) {
+    public List<Issue> doListIssues(String url, Configuration configuration) {
 
         try {
-
             JsonNode jsonNode = objectMapper.readTree(simpleRequest.doRequestGetWithAuth(url, configuration.getAuth()));
 
             return StreamSupport.stream(jsonNode.spliterator(), false)
@@ -73,14 +75,14 @@ public class GitHubService implements Git {
                     })
                     .collect(Collectors.toList());
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
 
         return new ArrayList<>();
     }
 
     @Override
-    public List<Contributors> doListContributors(String url) {
+    public List<Contributors> doListContributors(String url, Configuration configuration) {
 
         try {
             JsonNode jsonNode = objectMapper.readTree(simpleRequest.doRequestGetWithAuth(url, configuration.getAuth()));
@@ -95,7 +97,7 @@ public class GitHubService implements Git {
                     })
                     .collect(Collectors.toList());
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
 
         return new ArrayList<>();

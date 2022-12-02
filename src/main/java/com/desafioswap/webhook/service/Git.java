@@ -8,10 +8,12 @@ import java.util.List;
 
 public interface Git {
 
-    void doConfiguration();
-    List<UserGit> doUserDetails(List<Task> tasks) throws JsonProcessingException;
-    List<Issue> doListIssues(String url);
-    List<Contributors> doListContributors(String url) throws JsonProcessingException;
+    List<UserGit> doUserDetails(List<Task> tasks);
+
+    List<Issue> doListIssues(String url, Configuration configuration);
+
+    List<Contributors> doListContributors(String url, Configuration configuration);
+
     List<Label> doListLabels(JsonNode json);
 
 }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 @Service
 public class ConfigurationService {
@@ -18,6 +19,7 @@ public class ConfigurationService {
     public Configuration save(ConfigurationDTO configurationDTO){
 
         Configuration configuration = new Configuration();
+        configuration.setId(1L);
         configuration.setAuth(configurationDTO.getAuth());
         configuration.setUrlWebhook(configurationDTO.getUrlWebhook());
         configuration.setUrlGitHub(configurationDTO.getUrlGitHub());
@@ -25,9 +27,9 @@ public class ConfigurationService {
         return configurationRepository.save(configuration);
     }
 
-    public Configuration findById(Long id){
+    public Optional<Configuration> findConfiguration(){
 
-        return configurationRepository.findById(id).get();
+        return configurationRepository.findById(1L);
 
     }
 

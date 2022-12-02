@@ -8,6 +8,5 @@ import java.util.List;
 
 @Repository
 public interface UserGitRepository extends JpaRepository<UserGit, Long> {
-
     List<UserGit> findAllBySentFalse();
 }
